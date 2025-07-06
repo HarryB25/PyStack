@@ -31,8 +31,28 @@ ENV/
 *.swp
 *.swo
 
+# OS
+.DS_Store
+Thumbs.db
+
 # Project specific
 *.tiff
 *.ARW
 *.arw
+*.NEF
+*.nef
+*.CR2
+*.cr2
+*.CR3
+*.cr3
+*.RAF
+*.raf
+*.ORF
+*.orf
+*.DNG
+*.dng
+*.RW2
+*.rw2
+*.X3F
+*.x3f
 temp_* 

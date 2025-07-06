@@ -1,63 +1,103 @@
-# PyStack - RAW图像堆叠工具
+# PyStack - RAW图像堆栈工具
 
-PyStack 是一个用于处理和堆叠数码相机RAW格式图像的Python工具。它使用增量平均算法，可以处理大量图像序列而不会占用过多内存。
+PyStack是一个用于处理RAW格式图像的堆栈工具，支持多种堆栈模式。特别适合天文摄影、长曝光和高动态范围(HDR)图像的处理。
 
-## 功能特点
+## 特点
 
-- 支持 Sony ARW 格式RAW文件的读取和处理
-- 使用增量平均算法，内存占用低
-- 支持批量处理大量图像
-- 自动保存临时结果，防止处理中断导致数据丢失
-- 详细的日志记录
+- 支持多种堆栈模式：
+  - 平均值堆栈：适合降噪和提高信噪比
+  - 最大值堆栈：适合星轨和光绘摄影
+  - 最小值堆栈：适合去除移动物体
 
-## 安装要求
+- 其他功能：
+  - 支持批量处理
+  - 定期保存临时结果
+  - 详细的处理日志
+  - 低内存占用的增量处理
 
-- Python 3.6+
-- rawpy
-- numpy
-- tifffile
-- tqdm
+## 安装
 
-## 安装方法
-
+1. 克隆仓库：
 ```bash
-# 克隆仓库
-git clone https://github.com/你的用户名/PyStack.git
+git clone https://github.com/yourusername/PyStack.git
 cd PyStack
+```
 
-# 安装依赖
+2. 安装依赖：
+```bash
 pip install -r requirements.txt
 ```
 
 ## 使用方法
 
+### 命令行使用
+
+基本用法：
 ```bash
-python pystack/stack.py --input /path/to/raw/files --output result.tiff --start DSC00001.ARW --end DSC00100.ARW
+python -m pystack.stack --input /path/to/raw/files --output output.tiff --start first.ARW --end last.ARW
 ```
 
-### 参数说明
-
-- `--input`, `-i`: RAW文件所在的输入目录
-- `--output`, `-o`: 输出文件路径（默认为 ./mean_output.tiff）
-- `--start`: 起始文件名
-- `--end`: 结束文件名
-- `--save-interval`, `-s`: 临时结果保存间隔（默认每10张图像保存一次）
-
-## 示例
-
+完整参数说明：
 ```bash
-python pystack/stack.py -i ./raw_images -o stacked.tiff --start DSC00001.ARW --end DSC00050.ARW -s 5
+python -m pystack.stack \
+    --input /path/to/raw/files \  # 输入目录
+    --output output.tiff \        # 输出文件
+    --start first.ARW \          # 起始文件名
+    --end last.ARW \             # 结束文件名
+    --mode mean \                # 堆栈模式(mean/max/min)
+    --save-interval 10           # 临时保存间隔
 ```
 
-## 注意事项
+### 作为Python模块使用
 
-1. 确保有足够的磁盘空间存储临时文件和最终结果
-2. 处理过程中请勿关闭程序，以免数据丢失
-3. 建议先用少量图像测试后再处理大量图像
+```python
+from pystack.stack import create_calculator, StackMode
 
-## 贡献指南
+# 创建计算器实例
+calculator = create_calculator(StackMode.MEAN)
 
-欢迎提交 Issue 和 Pull Request！
+# 处理图像目录
+calculator.process_directory(
+    input_dir="raw_images",
+    output_path="output.tiff",
+    start_file="IMG_0001.ARW",
+    end_file="IMG_0100.ARW",
+    save_interval=10
+)
+```
+
+## 堆栈模式说明
+
+1. 平均值堆栈 (mean)
+   - 使用增量平均算法
+   - 内存占用最小
+   - 适合大量图像的降噪
+   - 最适合：夜空摄影、长曝光降噪
+
+2. 最大值堆栈 (max)
+   - 保留每个像素位置的最大值
+   - 适合星轨摄影
+   - 适合光绘创作
+   - 最适合：星轨摄影、光绘摄影
+
+3. 最小值堆栈 (min)
+   - 保留每个像素位置的最小值
+   - 适合去除移动物体
+   - 适合暗场处理
+   - 最适合：建筑摄影中去除游客、交通摄影去除车辆
+
+## 性能优化建议
+
+1. 堆栈模式选择：
+   - 星空摄影降噪：平均值堆栈
+   - 长曝光降噪：平均值堆栈
+   - 星轨摄影：最大值堆栈
+   - 移动物体去除：最小值堆栈
+
+2. 内存管理：
+   - 所有模式都使用增量处理算法
+   - 只需存储一张图片的内存空间
+   - 适合处理大量图像
 
 ## 许可证
 
